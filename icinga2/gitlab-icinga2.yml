@@ -1,0 +1,30 @@
+# This script ensures all commits to the production Icinga2 instance pass valid syntax checks.
+# Branch protection is enabled to facilitate peer via merge requests.
+
+# With inspiration from: https://github.com/mzac/gitlab-icinga2-ci-cd#create-runner-script
+stages:
+  - test
+  - deploy
+
+Test Icinga2 Config:
+  stage: test
+  
+  image: "mzac23/icinga2-check-config"
+  before_script:
+  # Copy all configs from the commit into the container/s Icinga2 conf directory
+     - cp -a $CI_PROJECT_DIR/ /etc/icinga2/conf.d/
+  
+     
+  script:
+  # Verify the Icinga2 configs pass a valid syntax check
+    - icinga2 daemon -C --log-level debug
+
+Git changes are sync'd via symlink:
+  stage: deploy
+  image: "mzac23/icinga2-check-config"
+  script:
+    # Webhook triggers Ansible Tower to run a playbook that runs a `git pull` on its configuration repo which sync the changes via symlink.
+    # Then the Icinga2 daemon is restarted, loading the new commits.
+    - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=master https://ansible-tower.example:443/api/v2/job_templates/125/gitlab/
+  only:
+  - master
