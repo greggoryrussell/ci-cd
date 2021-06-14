@@ -11,7 +11,7 @@ Test Icinga2 Config:
   
   image: "mzac23/icinga2-check-config"
   before_script:
-  # Copy all configs from the commit into the container/s Icinga2 conf directory
+  # Copy all configs from the commit into the container's Icinga2 conf directory
      - cp -a $CI_PROJECT_DIR/ /etc/icinga2/conf.d/
   
      
@@ -24,7 +24,7 @@ Git changes are sync'd via symlink:
   image: "mzac23/icinga2-check-config"
   script:
     # Webhook triggers Ansible Tower to run a playbook that runs a `git pull` on its configuration repo which sync the changes via symlink.
-    # Then the Icinga2 daemon is restarted, loading the new commits.
+    # Then the Icinga2 daemon is restarted, loading/synchronizing the new commits.
     - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=master https://ansible-tower.example:443/api/v2/job_templates/125/gitlab/
   only:
   - master
