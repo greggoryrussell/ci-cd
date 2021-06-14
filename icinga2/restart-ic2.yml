@@ -1,0 +1,22 @@
+---
+- hosts: production-icinga-host
+  become: yes
+
+  pre_tasks:
+  # Put the Icinga2 config files repo in a separate directory 
+  # which is symlinked to /etc/icinga2/conf.d
+  - git:
+      repo: git@gitlab.example:monitoring/icinga2.git
+      dest: /opt/icinga/icinga2
+      update: yes
+      force: yes 
+      # Even though it forces a `git pull`
+      # this will only be ran IF https://github.com/greggoryrussell/ci-cd/blob/main/icinga2/gitlab-icinga2.yml
+      # passes it's syntax validation
+  
+  tasks:
+  - name: restart icinga2
+    become: yes
+    service:
+      name: icinga2
+      state: restarted
