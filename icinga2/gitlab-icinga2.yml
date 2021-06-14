@@ -1,5 +1,5 @@
 # This script ensures all commits to the production Icinga2 instance pass valid syntax checks.
-# Branch protection is enabled to facilitate peer via merge requests.
+# Branch protection is enabled to facilitate peer review of code via merge requests.
 
 # With inspiration from: https://github.com/mzac/gitlab-icinga2-ci-cd#create-runner-script
 stages:
